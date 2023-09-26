@@ -3,7 +3,7 @@ from dash import dcc, html, dash_table
 import plotly.express as px
 import dash_bootstrap_components as dbc
 
-dash.register_page(__name__, path='/dataset-manager')
+dash.register_page(__name__, path='/content/a537f01f-de6f-4093-b216-89fef5cfba1b/dataset-manager')
 
 def create_shorthand_string(temp_string):
     shorthand_list=temp_string.split(' ')[0:2]
