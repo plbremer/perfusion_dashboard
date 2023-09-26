@@ -13,7 +13,7 @@ app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTS
 
 #custom ordering of navbar
 my_page_link_list=[
-    dbc.NavLink('Home', href='/',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
+    dbc.NavLink('Home', href='/content/a537f01f-de6f-4093-b216-89fef5cfba1b',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
     dbc.NavLink('Dataset Manager', href='/content/a537f01f-de6f-4093-b216-89fef5cfba1b/dataset-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
     dbc.NavLink('Unit Manager', href='/unit-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
     dbc.NavLink('Plotter', href='/plotter',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
