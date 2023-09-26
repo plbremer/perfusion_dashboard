@@ -9,7 +9,7 @@ local_stylesheet = {
     "rel": "stylesheet"
 }
 
-app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP, local_stylesheet ], url_base_pathname='https://rstudio.lab.altoslabs.com/content/a537f01f-de6f-4093-b216-89fef5cfba1b')
+app = dash.Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP, local_stylesheet ], url_base_pathname='/content/a537f01f-de6f-4093-b216-89fef5cfba1b')
 
 #custom ordering of navbar
 my_page_link_list=[
