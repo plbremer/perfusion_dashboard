@@ -64,7 +64,7 @@ layout = html.Div(
                                 'fontSize': 17,
                                 'padding': '8px',
                                 'textAlign': 'center'
-                            },
+                            },  
                             style_header={
                                 'font-family': 'arial',
                                 'fontSize': 15,
