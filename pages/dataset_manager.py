@@ -74,59 +74,61 @@ layout = html.Div(
                 dbc.Col(width=1),
                 dbc.Col(
                     children=[
-                        dash_table.DataTable(
-                            id='datatable_dataset',
-                            # columns=column_list,
-                            columns=[
-                                {
-                                    'id':'dataset_filename',
-                                    'name':'Dataset Filename'
+                        dbc.Spinner(
+                            dash_table.DataTable(
+                                id='datatable_dataset',
+                                # columns=column_list,
+                                columns=[
+                                    {
+                                        'id':'dataset_filename',
+                                        'name':'Dataset Filename'
+                                    },
+                                    {
+                                        'id':'dataset_shorthand',
+                                        'name':'Dataset Shorthand'
+                                    },
+                                    {
+                                        'id':'dataset_row_count',
+                                        'name':'Number of Rows'
+                                    },
+                                ],
+                                data=[],
+                                markdown_options={"link_target": "_blank"},
+                                # page_current=0,
+                                # page_size=50,
+                                # page_action='native',
+                                # sort_action='native',
+                                # sort_mode='multi',
+                                # filter_action='native',
+                                style_cell={
+                                    'fontSize': 17,
+                                    'padding': '8px',
+                                    'textAlign': 'left',
+                                    'textOverflow': 'ellipsis',
+                                    'maxWidth':0
                                 },
-                                {
-                                    'id':'dataset_shorthand',
-                                    'name':'Dataset Shorthand'
+                                style_header={
+                                    'font-family': 'arial',
+                                    'fontSize': 15,
+                                    'fontWeight': 'bold',
+                                    'textAlign': 'center'
                                 },
-                                {
-                                    'id':'dataset_row_count',
-                                    'name':'Number of Rows'
+                                style_data={
+                                    'textAlign': 'left',
+                                    'fontWeight': 'bold',
+                                    'font-family': 'Roboto',
+                                    'fontSize': 15,
                                 },
-                            ],
-                            data=[],
-                            markdown_options={"link_target": "_blank"},
-                            # page_current=0,
-                            # page_size=50,
-                            # page_action='native',
-                            # sort_action='native',
-                            # sort_mode='multi',
-                            # filter_action='native',
-                            style_cell={
-                                'fontSize': 17,
-                                'padding': '8px',
-                                'textAlign': 'left',
-                                'textOverflow': 'ellipsis',
-                                'maxWidth':0
-                            },
-                            style_header={
-                                'font-family': 'arial',
-                                'fontSize': 15,
-                                'fontWeight': 'bold',
-                                'textAlign': 'center'
-                            },
-                            style_data={
-                                'textAlign': 'left',
-                                'fontWeight': 'bold',
-                                'font-family': 'Roboto',
-                                'fontSize': 15,
-                            },
-                            style_cell_conditional=[
-                                {'if': {'column_id': 'dataset_filename'},
-                                'width': '60%'},
-                                {'if': {'column_id': 'dataset_shorthand'},
-                                'width': '20%'},
-                                {'if': {'column_id': 'dataset_row_count'},
-                                'width': '20%'},
-                            ],
-                            row_deletable=True
+                                style_cell_conditional=[
+                                    {'if': {'column_id': 'dataset_filename'},
+                                    'width': '60%'},
+                                    {'if': {'column_id': 'dataset_shorthand'},
+                                    'width': '20%'},
+                                    {'if': {'column_id': 'dataset_row_count'},
+                                    'width': '20%'},
+                                ],
+                                row_deletable=True
+                            )
                         )
                     ],
                     width=10
@@ -184,7 +186,7 @@ def remove_dataset(
     # print(len(datatable_dataset_data))
     # print('----')
 
-    print(DATAFRAME_DICT)
+    # print(DATAFRAME_DICT)
 
     if datatable_dataset_data_previous is None:
         raise PreventUpdate
@@ -210,7 +212,7 @@ def remove_dataset(
             current_datasets=set(
                 [temp_dict['dataset_filename'] for temp_dict in datatable_dataset_data]
             )
-            print(current_datasets)
+            # print(current_datasets)
             # global DATAFRAME_DICT
 
             dict_keys_to_remove=list()

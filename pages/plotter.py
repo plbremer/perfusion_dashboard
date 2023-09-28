@@ -433,8 +433,8 @@ def add_traces_to_datatable(
     checklist_parameters_value,
 ):
 
-    print(checklist_dataset_value)
-    print(checklist_parameters_value)
+    # print(checklist_dataset_value)
+    # print(checklist_parameters_value)
 
     new_traces=list()
     for temp_dataset in checklist_dataset_value:
@@ -453,7 +453,7 @@ def add_traces_to_datatable(
     temp_panda=pd.DataFrame.from_records(output_traces)
     temp_panda.drop_duplicates(inplace=True)
     output_traces=temp_panda.to_dict(orient='records')
-    print(output_traces)
+    # print(output_traces)
 
     return [output_traces]
 
@@ -531,7 +531,7 @@ def add_traces_to_scatter(
 
     traces=np.vstack(traces_list)
 
-    print(traces)
+    # print(traces)
     #adjust the x axis to something reasonable
     if radioitems_timesampling_value>59 and radioitems_timesampling_value<301:
         traces[:,0]=traces[:,0].astype(int)/60
