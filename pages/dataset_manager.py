@@ -8,7 +8,7 @@ import base64
 import io
 import pandas as pd
 
-from config import DATAFRAME_DICT
+from config import DATAFRAME_DICT,UNIT_DICT
 
 dash.register_page(__name__, path='/dataset-manager')
 
@@ -142,7 +142,75 @@ layout = html.Div(
 )
 
 
+def generate_yaxis_options():
+    global DATAFRAME_DICT
+    # print(DATAFRAME_DICT.keys())
+    if len(DATAFRAME_DICT.keys())>0:
+        yaxis_options=list()
+        total_column_set=set()
+        for temp_dataset in DATAFRAME_DICT.values():
+            total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
+        for temp_column in total_column_set:
+            if temp_column in UNIT_DICT.keys():
+                yaxis_options.append(
+                    {
+                        'label': temp_column,
+                        'value': temp_column
+                    }
+                )
+    # elif len(DATAFRAME_DICT.keys())==0 or :
+    else:
+        yaxis_options=list()
 
+    return yaxis_options
+
+
+# dcc.Store(id='dummy_store')
+@callback(
+    [
+        Output(component_id='store_dataset_keys_and_columns', component_property='data'),
+        # Output(component_id='store_panda_numeric', component_property='data'),
+        # Output(component_id='store_panda_nonnumeric', component_property='data'),
+    ],
+    [
+        
+        # Input(component_id="upload_dataset", component_property="contents"),
+        # Input(component_id='dummy_store', component_property='data'),
+        Input(component_id='datatable_dataset', component_property='data')
+        
+    ], 
+    # [
+    # #     State(component_id='dummy_store', component_property='data'),
+    #     State(component_id='datatable_dataset', component_property='data')
+    # ],
+    # prevent_initial_call=True,
+)
+def sync_dataset_datatable_and_store(
+    # dummy_store_data,
+    datatable_dataset_data
+):
+    '''
+    basically, 
+    '''
+    # print('are we here?')
+
+    output_dict={
+        'dataset_filename':[],
+        'dataset_shorthand':[],
+        'dataset_parameter':[]
+    }
+
+    for temp_row in datatable_dataset_data:
+        output_dict['dataset_filename'].append(
+            temp_row['dataset_filename']
+        )
+        output_dict['dataset_shorthand'].append(
+            temp_row['dataset_shorthand']
+        )
+
+    output_dict['dataset_parameter']=generate_yaxis_options()
+
+    return [output_dict]
 
 # dcc.Store(id='dummy_store')
 @callback(
@@ -159,7 +227,7 @@ layout = html.Div(
     ],
     [
         State(component_id='dummy_store', component_property='data'),
-        Input(component_id='datatable_dataset', component_property='data'),
+        State(component_id='datatable_dataset', component_property='data'),
         # State(component_id='datatable_dataset', component_property='data')
     ],
     # prevent_initial_call=True,

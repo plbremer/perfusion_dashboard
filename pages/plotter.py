@@ -12,7 +12,7 @@ import numpy as np
 
 from config import UNIT_DICT,DATAFRAME_DICT
 
-print(DATAFRAME_DICT.keys())
+# print(DATAFRAME_DICT.keys())
 
 dash.register_page(__name__, path='/plotter')
 
@@ -20,29 +20,9 @@ def create_shorthand_string(temp_string):
     shorthand_list=temp_string.split(' ')[0:2]
     return ' '.join(shorthand_list)
 
-def generate_yaxis_options():
-    global DATAFRAME_DICT
-    # print(DATAFRAME_DICT.keys())
-    if len(DATAFRAME_DICT.keys())>0:
-        yaxis_options=list()
-        total_column_set=set()
-        for temp_dataset in DATAFRAME_DICT.values():
-            total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
-        for temp_column in total_column_set:
-            if temp_column in UNIT_DICT.keys():
-                yaxis_options.append(
-                    {
-                        'label': temp_column,
-                        'value': temp_column
-                    }
-                )
-    # elif len(DATAFRAME_DICT.keys())==0 or :
-    else:
-        yaxis_options=list()
 
-    return yaxis_options
 
-layout = lambda: html.Div(
+layout = html.Div(
     children=[
         html.Br(),
         html.Br(),
@@ -62,19 +42,14 @@ layout = lambda: html.Div(
                                             dbc.Col(
                                                 dcc.Checklist(
                                                     id='checklist_dataset',
-                                                    options=[
-                                                        {
-                                                            'label': create_shorthand_string(temp_key),
-                                                            'value': temp_key
-                                                        } for temp_key in DATAFRAME_DICT.keys()
-                                                    ]
+                                                    options=[]
                                                 ),
                                                 width=6
                                             ),
                                             dbc.Col(
                                                 dcc.Checklist(
                                                     id='checklist_parameters',
-                                                    options=generate_yaxis_options()
+                                                    options=[]
                                                 ),
                                                 width=6
                                             )
@@ -405,6 +380,55 @@ layout = lambda: html.Div(
         )
     ],
 )
+
+
+
+
+@callback(
+    [
+        Output(component_id='checklist_dataset', component_property='options'),
+        Output(component_id='checklist_parameters', component_property='options'),
+        # Output(component_id='store_panda_nonnumeric', component_property='data'),
+    ],
+    [
+        Input(component_id='store_dataset_keys_and_columns', component_property="data"),
+        Input(component_id='url', component_property="pathname")
+    ],
+    # [
+    #     State(component_id="datatable_traces", component_property="data"),
+    #     State(component_id="checklist_dataset", component_property="value"),
+    #     State(component_id="checklist_parameters", component_property="value"),
+    #     # State(component_id='datatable_dataset', component_property='data')
+    # ],
+    # prevent_initial_call=True,
+)
+def aupdate_trace_selection_options(
+    store_dataset_keys_and_columns_data,
+    url_pathname
+):
+
+    # print(store_dataset_keys_and_columns_data.keys())
+    if len(store_dataset_keys_and_columns_data['dataset_filename'])==0:
+        return [ list(), list()]
+
+    # print('are we updating the options?')
+
+
+    checklist_dataset_options=[]
+    for i in range(len(store_dataset_keys_and_columns_data['dataset_filename'])):
+        checklist_dataset_options.append(
+            {
+                'label': store_dataset_keys_and_columns_data['dataset_shorthand'][i],
+                'value': store_dataset_keys_and_columns_data['dataset_filename'][i]
+            }
+        )
+
+    # print(checklist_dataset_options)
+    # print(store_dataset_keys_and_columns_data['dataset_parameter'])
+    # print('-------------------')
+
+    return [checklist_dataset_options,store_dataset_keys_and_columns_data['dataset_parameter']]
+    
 
 
 
