@@ -20,14 +20,10 @@ my_page_link_list=[
     dbc.NavLink('Dataset Manager', href='/content/a537f01f-de6f-4093-b216-89fef5cfba1b/dataset-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
     dbc.NavLink('Unit Manager', href='/content/a537f01f-de6f-4093-b216-89fef5cfba1b/unit-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
     dbc.NavLink('Plotter', href='/content/a537f01f-de6f-4093-b216-89fef5cfba1b/plotter',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
-    # dbc.NavLink('Home', href='/',style = {'color': 
-'white','font-weight':'bold'},className='navlink-parker'),
-    # dbc.NavLink('Dataset Manager', href='/dataset-manager',style = 
-{'color': 'white','font-weight':'bold'},className='navlink-parker'),
-    # dbc.NavLink('Unit Manager', href='/unit-manager',style = {'color': 
-'white','font-weight':'bold'},className='navlink-parker'),
-    # dbc.NavLink('Plotter', href='/plotter',style = {'color': 
-'white','font-weight':'bold'},className='navlink-parker'),
+    # dbc.NavLink('Home', href='/',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
+    # dbc.NavLink('Dataset Manager', href='/dataset-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
+    # dbc.NavLink('Unit Manager', href='/unit-manager',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
+    # dbc.NavLink('Plotter', href='/plotter',style = {'color': 'white','font-weight':'bold'},className='navlink-parker'),
 ]
 
 app.layout = html.Div(
