@@ -28,7 +28,7 @@ my_page_link_list=[
 
 app.layout = html.Div(
     [
-        dcc.Store(id='store_dataset_keys_and_columns',data={'dataset_filename':[],'dataset_shorthand':[],'total_columns':[]}),
+        dcc.Store(id='store_dataset_keys_and_columns',data={'dataset_filename':[],'dataset_shorthand':[],'dataset_parameter':[]}),
         dcc.Location('url'),
         dbc.NavbarSimple(
             children=[]+my_page_link_list,
