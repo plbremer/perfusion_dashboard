@@ -142,75 +142,75 @@ layout = html.Div(
 )
 
 
-def generate_yaxis_options():
-    global DATAFRAME_DICT
-    # print(DATAFRAME_DICT.keys())
-    if len(DATAFRAME_DICT.keys())>0:
-        yaxis_options=list()
-        total_column_set=set()
-        for temp_dataset in DATAFRAME_DICT.values():
-            total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
-        for temp_column in total_column_set:
-            if temp_column in UNIT_DICT.keys():
-                yaxis_options.append(
-                    {
-                        'label': temp_column,
-                        'value': temp_column
-                    }
-                )
-    # elif len(DATAFRAME_DICT.keys())==0 or :
-    else:
-        yaxis_options=list()
+# def generate_yaxis_options():
+#     global DATAFRAME_DICT
+#     # print(DATAFRAME_DICT.keys())
+#     if len(DATAFRAME_DICT.keys())>0:
+#         yaxis_options=list()
+#         total_column_set=set()
+#         for temp_dataset in DATAFRAME_DICT.values():
+#             total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
+#         for temp_column in total_column_set:
+#             if temp_column in UNIT_DICT.keys():
+#                 yaxis_options.append(
+#                     {
+#                         'label': temp_column,
+#                         'value': temp_column
+#                     }
+#                 )
+#     # elif len(DATAFRAME_DICT.keys())==0 or :
+#     else:
+#         yaxis_options=list()
 
-    return yaxis_options
+#     return yaxis_options
 
 
-# dcc.Store(id='dummy_store')
-@callback(
-    [
-        Output(component_id='store_dataset_keys_and_columns', component_property='data'),
-        # Output(component_id='store_panda_numeric', component_property='data'),
-        # Output(component_id='store_panda_nonnumeric', component_property='data'),
-    ],
-    [
+# # dcc.Store(id='dummy_store')
+# @callback(
+#     [
+#         Output(component_id='store_dataset_keys_and_columns', component_property='data'),
+#         # Output(component_id='store_panda_numeric', component_property='data'),
+#         # Output(component_id='store_panda_nonnumeric', component_property='data'),
+#     ],
+#     [
         
-        # Input(component_id="upload_dataset", component_property="contents"),
-        # Input(component_id='dummy_store', component_property='data'),
-        Input(component_id='datatable_dataset', component_property='data')
+#         # Input(component_id="upload_dataset", component_property="contents"),
+#         # Input(component_id='dummy_store', component_property='data'),
+#         Input(component_id='datatable_dataset', component_property='data')
         
-    ], 
-    # [
-    # #     State(component_id='dummy_store', component_property='data'),
-    #     State(component_id='datatable_dataset', component_property='data')
-    # ],
-    # prevent_initial_call=True,
-)
-def sync_dataset_datatable_and_store(
-    # dummy_store_data,
-    datatable_dataset_data
-):
-    '''
-    basically, 
-    '''
-    # print('are we here?')
+#     ], 
+#     # [
+#     # #     State(component_id='dummy_store', component_property='data'),
+#     #     State(component_id='datatable_dataset', component_property='data')
+#     # ],
+#     # prevent_initial_call=True,
+# )
+# def sync_dataset_datatable_and_store(
+#     # dummy_store_data,
+#     datatable_dataset_data
+# ):
+#     '''
+#     basically, 
+#     '''
+#     # print('are we here?')
 
-    output_dict={
-        'dataset_filename':[],
-        'dataset_shorthand':[],
-        'dataset_parameter':[]
-    }
+#     output_dict={
+#         'dataset_filename':[],
+#         'dataset_shorthand':[],
+#         'dataset_parameter':[]
+#     }
 
-    for temp_row in datatable_dataset_data:
-        output_dict['dataset_filename'].append(
-            temp_row['dataset_filename']
-        )
-        output_dict['dataset_shorthand'].append(
-            temp_row['dataset_shorthand']
-        )
+#     for temp_row in datatable_dataset_data:
+#         output_dict['dataset_filename'].append(
+#             temp_row['dataset_filename']
+#         )
+#         output_dict['dataset_shorthand'].append(
+#             temp_row['dataset_shorthand']
+#         )
 
-    output_dict['dataset_parameter']=generate_yaxis_options()
+#     output_dict['dataset_parameter']=generate_yaxis_options()
 
-    return [output_dict]
+#     return [output_dict]
 
 # dcc.Store(id='dummy_store')
 @callback(
@@ -248,13 +248,6 @@ def remove_dataset(
     check if addition or removal with lenght previous and legnth store
     '''
     global DATAFRAME_DICT
-
-    # print('we are here')
-    # print(len(datatable_dataset_data_previous))
-    # print(len(datatable_dataset_data))
-    # print('----')
-
-    # print(DATAFRAME_DICT)
 
     if datatable_dataset_data_previous is None:
         raise PreventUpdate
@@ -378,70 +371,3 @@ def add_dataset(
 
 
 
-
-
-# @callback(
-#     [
-#         Output(component_id='datatable_dataset', component_property='data'),
-#         # Output(component_id='store_panda_numeric', component_property='data'),
-#         # Output(component_id='store_panda_nonnumeric', component_property='data'),
-#     ],
-#     [
-#         Input(component_id="upload_dataset", component_property="contents"),
-#     ],
-#     [
-#         State(component_id="upload_dataset", component_property="filename"),
-#         State(component_id='datatable_dataset', component_property='data')
-#     ],
-#     # prevent_initial_call=True,
-# )
-# def remove_dataset(
-#     upload_dataset_contents,
-#     upload_dataset_filename,
-#     datatable_dataset_data
-# ):
-#     '''
-#     add the dataset to the global variable
-#     get the dataset description from the global variable
-#     send the data to the datatable
-#     '''
-
-#     # if upload_dataset_contents==None:
-#     #     raise PreventUpdate
-    
-#     # passes_checks=check_file(upload_dataset_filename.lower())
-#     # if passes_checks!=True:
-#     #     return [html.H6(passes_checks[0])]
-#     global DATAFRAME_DICT
-    
-    
-#     if upload_dataset_contents!=None:
-#         uploaded_panda=panda_from_csv(upload_dataset_contents)
-#         DATAFRAME_DICT[upload_dataset_filename]=uploaded_panda.copy()
-
-#     row_count_list=list()
-#     shorthand_list=list()
-#     filename_list=list()
-
-#     if len(DATAFRAME_DICT.keys())>=1:
-#         for temp_key in DATAFRAME_DICT.keys():
-#             filename_list.append(temp_key)
-
-#             shorthand_list.append(
-#                 create_shorthand_string(temp_key)
-#             )
-#             row_count_list.append(
-#                 len(DATAFRAME_DICT[temp_key].index)
-#             )
-
-#         output_list=[
-#             {
-#                 'dataset_filename':filename_list[i],
-#                 'dataset_shorthand':shorthand_list[i],
-#                 'dataset_row_count':row_count_list[i]
-#             } for i in range(len(row_count_list))
-#         ]
-#     elif len(DATAFRAME_DICT.keys())==0:
-#         output_list=[]
-
-#     return [output_list]

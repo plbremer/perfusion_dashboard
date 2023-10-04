@@ -16,10 +16,10 @@ layout = html.Div(
                     children=[
                         # html.H3('Publications:'),
                         # html.H5('Forthecoming'),
-                        # html.Br(),
-                        # html.Br(),
+                        html.Br(),
+                        html.Br(),
                         # html.H3('What is this tool?'),
-                        # html.H5('BinDiscover enables the easy exploration of data from twenty years of Gas-Chromatograph/Mass-Spectrometry metabolomics performed at the West Coast Metabolomics Center at the  University of California, Davis. We hope that this tool enables rapid hypothesis generation from these data.'),
+                        html.H5('A dashboard for the Belmonte Lab by Parker Gleason-Bremer and the DPSI Team.'),
                         # html.Br(),
                         # html.Br(), 
                         # html.H3('What are the different components?'),

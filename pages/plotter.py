@@ -37,6 +37,30 @@ layout = html.Div(
                                         html.H3('Choose What Data Get Plottted')
                                     ),
                                     html.Br(),
+
+
+                                    dbc.Row(
+                                        children=[
+                                            dbc.Col(width=3),
+                                            dbc.Col(
+                                                children=[
+                                                    dbc.Button('Clear Checkboxes', id='button_clear_checkboxes')
+                                                ],
+                                                width=2
+                                            ),
+                                            dbc.Col(width=2),
+                                            dbc.Col(
+                                                children=[
+                                                    dbc.Button('Clear Traces', id='button_clear_traces')  
+                                                ],
+                                                width=2
+                                            ),
+                                            dbc.Col(width=3)
+                                        ]
+                                    ),
+
+
+                                    html.Br(),
                                     dbc.Row(
                                         children=[
                                             dbc.Col(
@@ -369,7 +393,8 @@ layout = html.Div(
                         ),
                         dbc.Row(
                             dcc.Graph(
-                                id='main_plot'
+                                id='main_plot',
+                                style={'height':'80vh'}
                             )
                         )
                     ],
@@ -384,6 +409,31 @@ layout = html.Div(
 
 
 
+
+def generate_yaxis_options():
+    global DATAFRAME_DICT
+    # print(DATAFRAME_DICT.keys())
+    if len(DATAFRAME_DICT.keys())>0:
+        yaxis_options=list()
+        total_column_set=set()
+        for temp_dataset in DATAFRAME_DICT.values():
+            total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
+        for temp_column in total_column_set:
+            if temp_column in UNIT_DICT.keys():
+                yaxis_options.append(
+                    {
+                        'label': temp_column,
+                        'value': temp_column
+                    }
+                )
+    # elif len(DATAFRAME_DICT.keys())==0 or :
+    else:
+        yaxis_options=list()
+
+    return yaxis_options
+
+
+
 @callback(
     [
         Output(component_id='checklist_dataset', component_property='options'),
@@ -391,7 +441,7 @@ layout = html.Div(
         # Output(component_id='store_panda_nonnumeric', component_property='data'),
     ],
     [
-        Input(component_id='store_dataset_keys_and_columns', component_property="data"),
+        # Input(component_id='store_dataset_keys_and_columns', component_property="data"),
         Input(component_id='url', component_property="pathname")
     ],
     # [
@@ -402,33 +452,128 @@ layout = html.Div(
     # ],
     # prevent_initial_call=True,
 )
-def aupdate_trace_selection_options(
-    store_dataset_keys_and_columns_data,
+def update_trace_selection_options(
+    # store_dataset_keys_and_columns_data,
     url_pathname
 ):
 
-    # print(store_dataset_keys_and_columns_data.keys())
-    if len(store_dataset_keys_and_columns_data['dataset_filename'])==0:
-        return [ list(), list()]
+    global DATAFRAME_DICT
 
-    # print('are we updating the options?')
+    if len(DATAFRAME_DICT.keys())==0:
+        return [list(),list()]
 
+    output_dict={
+        'dataset_filename':[],
+        'dataset_shorthand':[],
+        'dataset_parameter':[]
+    }
 
+    for temp_key in DATAFRAME_DICT.keys():
+        output_dict['dataset_filename'].append(
+            temp_key
+        )
+        output_dict['dataset_shorthand'].append(
+            create_shorthand_string(temp_key)
+        )
+
+    output_dict['dataset_parameter']=generate_yaxis_options()
+
+    #this is a little silly and non-minimal but whatever
     checklist_dataset_options=[]
-    for i in range(len(store_dataset_keys_and_columns_data['dataset_filename'])):
+    for i in range(len(output_dict['dataset_filename'])):
         checklist_dataset_options.append(
             {
-                'label': store_dataset_keys_and_columns_data['dataset_shorthand'][i],
-                'value': store_dataset_keys_and_columns_data['dataset_filename'][i]
+                'label': output_dict['dataset_shorthand'][i],
+                'value': output_dict['dataset_filename'][i]
             }
         )
 
-    # print(checklist_dataset_options)
-    # print(store_dataset_keys_and_columns_data['dataset_parameter'])
-    # print('-------------------')
 
-    return [checklist_dataset_options,store_dataset_keys_and_columns_data['dataset_parameter']]
+    return [checklist_dataset_options,output_dict['dataset_parameter']]
+
+
+
+
+
+
+
+
+# @callback(
+#     [
+#         Output(component_id='checklist_dataset', component_property='options'),
+#         Output(component_id='checklist_parameters', component_property='options'),
+#         # Output(component_id='store_panda_nonnumeric', component_property='data'),
+#     ],
+#     [
+#         Input(component_id='store_dataset_keys_and_columns', component_property="data"),
+#         Input(component_id='url', component_property="pathname")
+#     ],
+#     # [
+#     #     State(component_id="datatable_traces", component_property="data"),
+#     #     State(component_id="checklist_dataset", component_property="value"),
+#     #     State(component_id="checklist_parameters", component_property="value"),
+#     #     # State(component_id='datatable_dataset', component_property='data')
+#     # ],
+#     # prevent_initial_call=True,
+# )
+# def update_trace_selection_options(
+#     store_dataset_keys_and_columns_data,
+#     url_pathname
+# ):
+
+#     # print(store_dataset_keys_and_columns_data.keys())
+#     if len(store_dataset_keys_and_columns_data['dataset_filename'])==0:
+#         return [ list(), list()]
+
+#     # print('are we updating the options?')
+
+
+#     checklist_dataset_options=[]
+#     for i in range(len(store_dataset_keys_and_columns_data['dataset_filename'])):
+#         checklist_dataset_options.append(
+#             {
+#                 'label': store_dataset_keys_and_columns_data['dataset_shorthand'][i],
+#                 'value': store_dataset_keys_and_columns_data['dataset_filename'][i]
+#             }
+#         )
+
+#     # print(checklist_dataset_options)
+#     # print(store_dataset_keys_and_columns_data['dataset_parameter'])
+#     # print('-------------------')
+
+#     return [checklist_dataset_options,store_dataset_keys_and_columns_data['dataset_parameter']]
     
+
+
+@callback(
+    [
+        Output(component_id="checklist_dataset", component_property="value"),
+        Output(component_id="checklist_parameters", component_property="value"),
+        # Output(component_id='store_panda_nonnumeric', component_property='data'),
+    ],
+    [
+        Input(component_id='button_clear_checkboxes', component_property="n_clicks"),
+        # Input(component_id='url', component_property="pathname")
+    ],
+    # [
+    # #     State(component_id="datatable_traces", component_property="data"),
+    #     State(component_id='checklist_dataset', component_property='options'),
+    #     State(component_id='checklist_parameters', component_property='options'),
+    # #     # State(component_id='datatable_dataset', component_property='data')
+    # ],
+    prevent_initial_call=True,
+)
+def clear_checkboxes(
+        button_clear_checkboxes_n_clicks,
+        # checklist_dataset_options,
+        # checklist_parameters_options,
+):
+    # print('in the cleaning function')
+    return [[],[]]
+
+
+
+
 
 
 
@@ -441,6 +586,7 @@ def aupdate_trace_selection_options(
     ],
     [
         Input(component_id="button_add_trace", component_property="n_clicks"),
+        Input(component_id="button_clear_traces", component_property="n_clicks")
     ],
     [
         State(component_id="datatable_traces", component_property="data"),
@@ -452,6 +598,7 @@ def aupdate_trace_selection_options(
 )
 def add_traces_to_datatable(
     button_add_trace_n_clicks,
+    button_clear_traces_n_clicks,
     datatable_traces_data,
     checklist_dataset_value,
     checklist_parameters_value,
@@ -459,6 +606,17 @@ def add_traces_to_datatable(
 
     # print(checklist_dataset_value)
     # print(checklist_parameters_value)
+
+    # print(ctx.triggered_id)
+
+    if ctx.triggered_id=='button_clear_traces':
+        #raise PreventUpdate
+        # return {
+        #     'dataset_filename':[],
+        #     'dataset_shorthand':[],
+        #     'dataset_parameter':[]
+        # }
+        return [[]]
 
     new_traces=list()
     for temp_dataset in checklist_dataset_value:
@@ -536,6 +694,9 @@ def add_traces_to_scatter(
 ):
     global DATAFRAME_DICT
     global UNIT_DICT    
+
+    if len(datatable_traces_data)==0:
+        raise PreventUpdate
 
     # concat_list=list()
     traces_list=list()
@@ -622,6 +783,13 @@ def add_traces_to_scatter(
     #         color=string_name_array[downsampling_mask],
     #         opacity=0.01*opacity_percent_value
     #     )
+
+    temp_figure.update_layout(
+        font=dict(
+            size=14
+        )
+    )
+
 
     return [temp_figure]
                                                     
