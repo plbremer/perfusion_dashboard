@@ -19,8 +19,7 @@ layout = html.Div(
                         # html.Br(),
                         # html.Br(),
                         # html.H3('What is this tool?'),
-                        # html.H5('A dashboard for the Belmonte Lab by 
-Parker Gleason-Bremer and the DPSI Team.'),
+                        # html.H5('A dashboard for the Belmonte Lab by Parker Gleason-Bremer and the DPSI Team.'),
                         # html.Br(),
                         # html.Br(), 
                         # html.H3('What are the different components?'),
