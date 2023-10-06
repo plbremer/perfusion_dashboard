@@ -41,7 +41,7 @@ layout = html.Div(
 
                                     dbc.Row(
                                         children=[
-                                            dbc.Col(width=3),
+                                            dbc.Col(width=1),
                                             dbc.Col(
                                                 children=[
                                                     dbc.Button('Clear Checkboxes', id='button_clear_checkboxes')
@@ -55,7 +55,14 @@ layout = html.Div(
                                                 ],
                                                 width=2
                                             ),
-                                            dbc.Col(width=3)
+                                            dbc.Col(width=2),
+                                            dbc.Col(
+                                                children=[
+                                                    dbc.Button('Clear All', id='button_clear_all')  
+                                                ],
+                                                width=2
+                                            ),
+                                            dbc.Col(width=1)
                                         ]
                                     ),
 
@@ -553,6 +560,7 @@ def update_trace_selection_options(
     ],
     [
         Input(component_id='button_clear_checkboxes', component_property="n_clicks"),
+        Input(component_id='button_clear_all', component_property="n_clicks"),
         # Input(component_id='url', component_property="pathname")
     ],
     # [
@@ -565,6 +573,7 @@ def update_trace_selection_options(
 )
 def clear_checkboxes(
         button_clear_checkboxes_n_clicks,
+        button_clear_all_n_clicks
         # checklist_dataset_options,
         # checklist_parameters_options,
 ):
@@ -586,7 +595,8 @@ def clear_checkboxes(
     ],
     [
         Input(component_id="button_add_trace", component_property="n_clicks"),
-        Input(component_id="button_clear_traces", component_property="n_clicks")
+        Input(component_id="button_clear_traces", component_property="n_clicks"),
+        Input(component_id='button_clear_all', component_property="n_clicks"),
     ],
     [
         State(component_id="datatable_traces", component_property="data"),
@@ -599,6 +609,7 @@ def clear_checkboxes(
 def add_traces_to_datatable(
     button_add_trace_n_clicks,
     button_clear_traces_n_clicks,
+    button_clear_all_n_clicks,
     datatable_traces_data,
     checklist_dataset_value,
     checklist_parameters_value,
@@ -609,7 +620,7 @@ def add_traces_to_datatable(
 
     # print(ctx.triggered_id)
 
-    if ctx.triggered_id=='button_clear_traces':
+    if ctx.triggered_id=='button_clear_traces' or ctx.triggered_id=='button_clear_all':
         #raise PreventUpdate
         # return {
         #     'dataset_filename':[],
@@ -663,6 +674,7 @@ def determine_y_axis_string_value(datatable_traces_data):
     ],
     [
         Input(component_id="button_render_plot", component_property="n_clicks"),
+        Input(component_id='button_clear_all', component_property="n_clicks"),
     ],
     [
         State(component_id="datatable_traces", component_property="data"),
@@ -683,6 +695,8 @@ def determine_y_axis_string_value(datatable_traces_data):
 )
 def add_traces_to_scatter(
     button_render_plot_n_clicks,
+    button_clear_all_n_clicks,
+
     datatable_traces_data,
 
     radioitems_timesampling_value,
@@ -692,6 +706,16 @@ def add_traces_to_scatter(
     slider_opacity_percent_value,
     downsampling_limit_value
 ):
+    if ctx.triggered_id=='button_clear_all':
+        #raise PreventUpdate
+        # return {
+        #     'dataset_filename':[],
+        #     'dataset_shorthand':[],
+        #     'dataset_parameter':[]
+        # }
+        return [{}]
+    
+    
     global DATAFRAME_DICT
     global UNIT_DICT    
 
