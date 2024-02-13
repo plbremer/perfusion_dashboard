@@ -7,46 +7,82 @@ from dash.dependencies import Input, Output, State
 import base64
 import io
 import pandas as pd
+import openpyxl
 
-from config import DATAFRAME_DICT
+from config import DATAFRAME_DICT_BIOCHEMISTRY
 
-dash.register_page(__name__, path='/dataset-manager')
+dash.register_page(__name__, path='/dataset-manager-biochemistry')
 
-
-
-def create_shorthand_string(temp_string):
-    shorthand_list=temp_string.split(' ')[0:2]
-    return ' '.join(shorthand_list)
+def create_shorthand_string_biochemistry(temp_string):
+    '''
+    '''
+    return temp_string.split(': ')[1]
+    # return temp_string
 
 
 def check_file(filename):
-    if '.csv' not in filename:
-        return ['Did you mean to upload a .csv?']
+    if '.xlsx' not in filename:
+        return ['Did you mean to upload a .xlsx?']
     else:
         return True
 
-def panda_from_csv(content_string):
-    
+def get_sheet_names(bytes_object):
+    try:
+        workbook = openpyxl.load_workbook(bytes_object)
+        sheet_names = workbook.sheetnames
+        return sheet_names
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+def coerce_one_sheet(bytes_object,temp_sheet):
+    temp_df=pd.read_excel(
+        io=bytes_object,
+        sheet_name=temp_sheet,
+        header=None
+    )
+    temp_df=temp_df.dropna(how='all')
+    temp_df=temp_df.T
+    temp_df.columns=temp_df.iloc[0]
+    temp_df=temp_df.drop([0,1],axis='index')
+    temp_df['Time from perfusion onset (h)']=temp_df['Time from perfusion onset (h)'].astype(float).round(decimals=2)
+    temp_df=temp_df.drop(['Date','Hour'],axis='columns')
+    pattern = r'(\d+\.\d+|\d+)'
+    for temp_df_col in temp_df.columns:
+        temp_df[temp_df_col]=temp_df[temp_df_col].astype(str).str.extract(pattern, expand=False)
+    temp_df=temp_df.reset_index(drop=True)
+    return temp_df
+
+
+def pandas_from_xlsx(content_string):
     content_type, content_string = content_string.split(',')
     decoded=base64.b64decode(content_string)
-    temp_dataframe=pd.read_csv(
-        io.BytesIO(decoded)
-    )
-    return temp_dataframe
+    bytes_object=io.BytesIO(decoded)
+    sheet_names=get_sheet_names(bytes_object)
+    sheet_dict=dict()
+    for temp_sheet in sheet_names:
+        if 'liver' not in temp_sheet.lower():
+            continue
+        else:
+            sheet_dict['sheet: '+temp_sheet]=coerce_one_sheet(bytes_object,temp_sheet)
+    return sheet_dict
 
+    # temp_dataframe=pd.read_csv(
+        
+    # )
 
 layout = html.Div(
     children=[
         html.Br(),
         html.Br(),
-        dcc.Store(id='dummy_store'),
+        dcc.Store(id='dummy_store_biochemistry'),
         dbc.Row(
             children=[
                 dbc.Col(width=4),
                 dbc.Col(
                     children=[
                         dcc.Upload(
-                            id='upload_dataset',
+                            id='upload_dataset_biochemistry',
                             children=html.Div([
                                 'Upload Dataset',
                             ]),
@@ -71,12 +107,12 @@ layout = html.Div(
         html.Br(),
         dbc.Row(
             children=[
-                dbc.Col(width=1),
+                dbc.Col(width=3),
                 dbc.Col(
                     children=[
                         dbc.Spinner(
                             dash_table.DataTable(
-                                id='datatable_dataset',
+                                id='datatable_dataset_biochemistry',
                                 # columns=column_list,
                                 columns=[
                                     {
@@ -88,8 +124,8 @@ layout = html.Div(
                                         'name':'Dataset Shorthand'
                                     },
                                     {
-                                        'id':'dataset_row_count',
-                                        'name':'Number of Rows'
+                                        'id':'dataset_timepoint_count',
+                                        'name':'Number of Timepoints'
                                     },
                                 ],
                                 data=[],
@@ -121,113 +157,38 @@ layout = html.Div(
                                 },
                                 style_cell_conditional=[
                                     {'if': {'column_id': 'dataset_filename'},
-                                    'width': '60%'},
+                                    'width': '40%'},
                                     {'if': {'column_id': 'dataset_shorthand'},
                                     'width': '20%'},
                                     {'if': {'column_id': 'dataset_row_count'},
-                                    'width': '20%'},
+                                    'width': '40%'},
                                 ],
                                 row_deletable=True
                             )
                         )
                     ],
-                    width=10
+                    width=6
                 ),
-                dbc.Col(width=1)
+                dbc.Col(width=3)
             ]
         )
-
-
     ],
 )
 
 
-# def generate_yaxis_options():
-#     global DATAFRAME_DICT
-#     # print(DATAFRAME_DICT.keys())
-#     if len(DATAFRAME_DICT.keys())>0:
-#         yaxis_options=list()
-#         total_column_set=set()
-#         for temp_dataset in DATAFRAME_DICT.values():
-#             total_column_set=total_column_set.union(set(temp_dataset.columns.tolist()))
-#         for temp_column in total_column_set:
-#             if temp_column in UNIT_DICT.keys():
-#                 yaxis_options.append(
-#                     {
-#                         'label': temp_column,
-#                         'value': temp_column
-#                     }
-#                 )
-#     # elif len(DATAFRAME_DICT.keys())==0 or :
-#     else:
-#         yaxis_options=list()
-
-#     return yaxis_options
-
-
-# # dcc.Store(id='dummy_store')
-# @callback(
-#     [
-#         Output(component_id='store_dataset_keys_and_columns', component_property='data'),
-#         # Output(component_id='store_panda_numeric', component_property='data'),
-#         # Output(component_id='store_panda_nonnumeric', component_property='data'),
-#     ],
-#     [
-        
-#         # Input(component_id="upload_dataset", component_property="contents"),
-#         # Input(component_id='dummy_store', component_property='data'),
-#         Input(component_id='datatable_dataset', component_property='data')
-        
-#     ], 
-#     # [
-#     # #     State(component_id='dummy_store', component_property='data'),
-#     #     State(component_id='datatable_dataset', component_property='data')
-#     # ],
-#     # prevent_initial_call=True,
-# )
-# def sync_dataset_datatable_and_store(
-#     # dummy_store_data,
-#     datatable_dataset_data
-# ):
-#     '''
-#     basically, 
-#     '''
-#     # print('are we here?')
-
-#     output_dict={
-#         'dataset_filename':[],
-#         'dataset_shorthand':[],
-#         'dataset_parameter':[]
-#     }
-
-#     for temp_row in datatable_dataset_data:
-#         output_dict['dataset_filename'].append(
-#             temp_row['dataset_filename']
-#         )
-#         output_dict['dataset_shorthand'].append(
-#             temp_row['dataset_shorthand']
-#         )
-
-#     output_dict['dataset_parameter']=generate_yaxis_options()
-
-#     return [output_dict]
-
-# dcc.Store(id='dummy_store')
 @callback(
     [
-        Output(component_id='dummy_store', component_property='data'),
+        Output(component_id='dummy_store_biochemistry', component_property='data'),
         # Output(component_id='store_panda_numeric', component_property='data'),
         # Output(component_id='store_panda_nonnumeric', component_property='data'),
     ],
     [
-        
         # Input(component_id="upload_dataset", component_property="contents"),
-        Input(component_id="datatable_dataset", component_property="data_previous"),
-        
+        Input(component_id="datatable_dataset_biochemistry", component_property="data_previous"),
     ],
     [
-        State(component_id='dummy_store', component_property='data'),
-        State(component_id='datatable_dataset', component_property='data'),
+        State(component_id='dummy_store_biochemistry', component_property='data'),
+        State(component_id='datatable_dataset_biochemistry', component_property='data'),
         # State(component_id='datatable_dataset', component_property='data')
     ],
     # prevent_initial_call=True,
@@ -247,17 +208,12 @@ def remove_dataset(
 
     check if addition or removal with lenght previous and legnth store
     '''
-    global DATAFRAME_DICT
+    global DATAFRAME_DICT_BIOCHEMISTRY
 
     if datatable_dataset_data_previous is None:
         raise PreventUpdate
     if len(datatable_dataset_data_previous) < len(datatable_dataset_data):
         raise PreventUpdate
-    # elif len(datatable_dataset_data)==0:
-    #     # global DATAFRAME_DICT
-    #     DATAFRAME_DICT=dict()
-
-    
     
     elif len(datatable_dataset_data_previous) > len(datatable_dataset_data):
         # print('previous is greater than current')
@@ -267,7 +223,7 @@ def remove_dataset(
             # print(DATAFRAME_DICT.keys()[0])
             # print(DATAFRAME_DICT)
             # del DATAFRAME_DICT[DATAFRAME_DICT.keys()[0]]
-            DATAFRAME_DICT=dict()
+            DATAFRAME_DICT_BIOCHEMISTRY=dict()
         elif len(datatable_dataset_data)>0:
 
             current_datasets=set(
@@ -277,12 +233,12 @@ def remove_dataset(
             # global DATAFRAME_DICT
 
             dict_keys_to_remove=list()
-            for temp_key in DATAFRAME_DICT.keys():
+            for temp_key in DATAFRAME_DICT_BIOCHEMISTRY.keys():
                 if temp_key not in current_datasets:
                     dict_keys_to_remove.append(temp_key)
                     
             for temp_key in dict_keys_to_remove:
-                del DATAFRAME_DICT[temp_key]
+                del DATAFRAME_DICT_BIOCHEMISTRY[temp_key]
 
     return [dummy_store_data]
 
@@ -291,22 +247,22 @@ def remove_dataset(
 
 @callback(
     [
-        Output(component_id='datatable_dataset', component_property='data'),
+        Output(component_id='datatable_dataset_biochemistry', component_property='data'),
         # Output(component_id='store_panda_numeric', component_property='data'),
         # Output(component_id='store_panda_nonnumeric', component_property='data'),
     ],
     [
-        Input(component_id="upload_dataset", component_property="contents"),
+        Input(component_id="upload_dataset_biochemistry", component_property="contents"),
         # Input(component_id="datatable_dataset", component_property="previous"),
         # Input(component_id='datatable_dataset', component_property='data'),
     ],
     [
-        State(component_id="upload_dataset", component_property="filename"),
+        State(component_id="upload_dataset_biochemistry", component_property="filename"),
         # State(component_id='datatable_dataset', component_property='data')
     ],
     # prevent_initial_call=True,
 )
-def add_dataset(
+def add_datasets(
     upload_dataset_contents,
     # datatable_dataset_data_previous
     # datatable_dataset_data,
@@ -321,6 +277,10 @@ def add_dataset(
 
     comparing the length of previous to the current data length informs us about 
     if this was called because of an add
+
+    the behavior of this uploader is different compared to the behavior of previous uploader
+    in the previous uploader, one csv corresponded to one "sample". in this version, one .xlsx
+    defines the entire set of samples. 
     '''
 
     # if upload_dataset_contents==None:
@@ -329,41 +289,44 @@ def add_dataset(
     # passes_checks=check_file(upload_dataset_filename.lower())
     # if passes_checks!=True:
     #     return [html.H6(passes_checks[0])]
-    global DATAFRAME_DICT
+    global DATAFRAME_DICT_BIOCHEMISTRY
     
     
     if upload_dataset_contents!=None:
-        uploaded_panda=panda_from_csv(upload_dataset_contents)
-        DATAFRAME_DICT[upload_dataset_filename]=uploaded_panda.copy()
+        uploaded_pandas=pandas_from_xlsx(upload_dataset_contents)
+        # uploaded_panda=panda_from_csv(upload_dataset_contents)
+        for dataset in uploaded_pandas.keys():
+
+            DATAFRAME_DICT_BIOCHEMISTRY[dataset]=uploaded_pandas[dataset]
 
     
 
     
 
 
-    row_count_list=list()
+    timepoint_count_list=list()
     shorthand_list=list()
     filename_list=list()
 
-    if len(DATAFRAME_DICT.keys())>=1:
-        for temp_key in DATAFRAME_DICT.keys():
+    if len(DATAFRAME_DICT_BIOCHEMISTRY.keys())>=1:
+        for temp_key in DATAFRAME_DICT_BIOCHEMISTRY.keys():
             filename_list.append(temp_key)
 
             shorthand_list.append(
-                create_shorthand_string(temp_key)
+                create_shorthand_string_biochemistry(temp_key)
             )
-            row_count_list.append(
-                len(DATAFRAME_DICT[temp_key].index)
+            timepoint_count_list.append(
+                len(DATAFRAME_DICT_BIOCHEMISTRY[temp_key].index)
             )
 
         output_list=[
             {
                 'dataset_filename':filename_list[i],
                 'dataset_shorthand':shorthand_list[i],
-                'dataset_row_count':row_count_list[i]
-            } for i in range(len(row_count_list))
+                'dataset_timepoint_count':timepoint_count_list[i]
+            } for i in range(len(timepoint_count_list))
         ]
-    elif len(DATAFRAME_DICT.keys())==0:
+    elif len(DATAFRAME_DICT_BIOCHEMISTRY.keys())==0:
         output_list=[]
 
     return [output_list]
