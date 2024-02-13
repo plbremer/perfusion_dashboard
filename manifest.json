@@ -15,7 +15,7 @@
   },
   "files": {
     "requirements.txt": {
-      "checksum": "1daaca571675b5ae3a84ffd7a67f58fe"
+      "checksum": "ee17c809464cace0d2776e463768a59e"
     },
     ".gitignore": {
       "checksum": "02cde0b8a55f20d41ef1bf35a81a06e8"
@@ -24,19 +24,46 @@
       "checksum": "68389b0fd71f25b1ce94c397840fd93f"
     },
     "app.py": {
-      "checksum": "412512432023d2617627e33e5770c8a4"
+      "checksum": "559bb4a76085aed85fabf0e72bed773d"
+    },
+    "config.py": {
+      "checksum": "94049048de846fe0ba5a5fb0dd9515b1"
     },
     "pages/__pycache__/dataset_manager.cpython-310.pyc": {
-      "checksum": "1ebd2978955bebad4864787fe54ffc50"
+      "checksum": "3466d5f0d8d80cedaaea218794f530e8"
+    },
+    "pages/__pycache__/dataset_manager_biochemistry.cpython-310.pyc": {
+      "checksum": "3f5cad38cb3467e5169787b71438ec6e"
     },
     "pages/__pycache__/home.cpython-310.pyc": {
-      "checksum": "79c5d2aad71094d319c6bc7181f8ab9f"
+      "checksum": "c15f00bf91dbea7ff0cea89fca363ada"
+    },
+    "pages/__pycache__/plotter.cpython-310.pyc": {
+      "checksum": "f01abef13fa15c5b8df68441f50e9273"
+    },
+    "pages/__pycache__/unit_manager.cpython-310.pyc": {
+      "checksum": "a21603072bf1b20ebb884474ee0650d5"
+    },
+    "pages/__pycache__/unit_manager_biochemistry.cpython-310.pyc": {
+      "checksum": "0e7d8fb2084074de49232afcdaf7f735"
     },
     "pages/dataset_manager.py": {
-      "checksum": "88da822ef6ac83cae6231e8d6a5b0b91"
+      "checksum": "985defb9ff466d1bf83bb751870ab02e"
+    },
+    "pages/dataset_manager_biochemistry.py": {
+      "checksum": "60a58cdfda822de37d30a79fafb6469c"
     },
     "pages/home.py": {
-      "checksum": "21e6a9f77e51c3018fed863b8b57669a"
+      "checksum": "c7e251d042b5aab393e8a65d38bd6656"
+    },
+    "pages/plotter.py": {
+      "checksum": "fbdfd0101ffb869dec731cac077c316c"
+    },
+    "pages/unit_manager.py": {
+      "checksum": "46b0d7db24480e2784facc5aff341984"
+    },
+    "pages/unit_manager_biochemistry.py": {
+      "checksum": "109bfadbd1150529eacf6f91bd846ced"
     }
   }
 }
