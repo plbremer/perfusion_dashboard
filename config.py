@@ -1,5 +1,7 @@
 DATAFRAME_DICT=dict()
 
+DATAFRAME_DICT_BIOCHEMISTRY=dict()
+
 UNIT_DICT={
     'pO2':'mmHG',
     'pCO2':'mmHG',
@@ -14,4 +16,24 @@ UNIT_DICT={
     'IvcPressure':'mmHG',
     'O2%':'No Unit',
     'Air%':'No Unit',
+}
+
+UNIT_DICT_BIOCHEMISTRY={
+    'Glucose':	'mg/dL',
+    'Aspartate aminotransferase (AST)':	'U/L',
+    'Alanine aminotransferase (ALT)':	'U/L',
+    'Gamma glutamil transpeptidase (GGT)':	'U/L',
+    'Bilirrubina total':	'mg/dL',
+    'Alcaline Fosfatase':	'U/L',
+    'Lactate deshidrogenase (LDH)':	'U/L',
+    'Sodium':	'mEq/L',
+    'Potassium':	'mEq/L',
+    'Lactate':	'mg/dL',
+    'Leucocytes':	'10^9/L',
+    'Eritrocytes':	'10^12/L',
+    'Hemoglobin':	'g/L',
+    'Haematrocrit':	'L/L',
+    'Prothrombin time (%)':	'%',
+    'Prothrombin time (seg)':	'seg',
+    'TTPa':	'seg',
 }

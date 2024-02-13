@@ -15,7 +15,7 @@
   },
   "files": {
     "requirements.txt": {
-      "checksum": "ee17c809464cace0d2776e463768a59e"
+      "checksum": "01bb622addeed0e14197a3afd6994d22"
     },
     ".gitignore": {
       "checksum": "02cde0b8a55f20d41ef1bf35a81a06e8"
@@ -27,7 +27,7 @@
       "checksum": "559bb4a76085aed85fabf0e72bed773d"
     },
     "config.py": {
-      "checksum": "94049048de846fe0ba5a5fb0dd9515b1"
+      "checksum": "7c59761ae2571a1f8ca6e9fd5117ce8e"
     },
     "pages/__pycache__/dataset_manager.cpython-310.pyc": {
       "checksum": "3466d5f0d8d80cedaaea218794f530e8"
