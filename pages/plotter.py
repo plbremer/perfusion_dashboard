@@ -36,7 +36,7 @@ layout = html.Div(
                     width=0
                 ),
                 dbc.Col(
-                    html.H2("Original Data"),
+                    html.H2("Metra Data"),
                     style={'textAlign': 'center'},
                     width=5
                 ),
