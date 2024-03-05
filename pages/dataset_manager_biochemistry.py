@@ -51,6 +51,16 @@ def coerce_one_sheet(bytes_object,temp_sheet):
     for temp_df_col in temp_df.columns:
         temp_df[temp_df_col]=temp_df[temp_df_col].astype(str).str.extract(pattern, expand=False)
     temp_df=temp_df.reset_index(drop=True)
+    print(temp_df)
+    # print(temp_df['pH',:])
+    temp_df['pH']=temp_df['pH'].where(
+        cond=(temp_df['pH'].astype(float)<20),
+        other=(temp_df['pH'].astype(float)/1000).astype(str)
+    )
+    temp_df['pH, bile']=temp_df['pH, bile'].where(
+        cond=(temp_df['pH, bile'].astype(float)<20),
+        other=(temp_df['pH, bile'].astype(float)/1000).astype(str)
+    )
     return temp_df
 
 

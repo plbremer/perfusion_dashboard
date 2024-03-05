@@ -512,6 +512,7 @@ def generate_yaxis_options():
                         'value': temp_column
                     }
                 )
+        yaxis_options=sorted(yaxis_options,key=lambda x:x['label'])
     else:
         yaxis_options=list()
     return yaxis_options
@@ -802,6 +803,7 @@ def generate_yaxis_options_biochemistry():
                         'value': temp_column
                     }
                 )
+        yaxis_options=sorted(yaxis_options,key=lambda x:x['label'])
     else:
         yaxis_options=list()
     return yaxis_options
