@@ -10,6 +10,7 @@ import pandas as pd
 import itertools
 import numpy as np
 from pprint import pprint
+import math
 
 from config import UNIT_DICT,DATAFRAME_DICT,UNIT_DICT_BIOCHEMISTRY,DATAFRAME_DICT_BIOCHEMISTRY
 
@@ -421,6 +422,25 @@ layout = html.Div(
                                         ],
                                         value='dont_change_values',
                                     ),
+                                    html.H6('Imputation'),
+                                    dbc.RadioItems(
+                                        id="radioitems_imputation_biochemistry",
+                                        className="btn-group",
+                                        inputClassName="btn-check",
+                                        labelClassName="btn btn-outline-primary",
+                                        labelCheckedClassName="active",
+                                        options=[
+                                            {"label": "No Imputation", "value": 'no_imputation'},
+                                            {"label": "Imputation", "value": 'imputation'},
+                                            # {"label": "Adj. Point Weighted Avg., 6 hrs.", "value": 'weighted_hr_6'},
+                                            # {"label": "Adj. Point Weighted Avg., 12 hrs.", "value": 'weighted_hr_12'},
+                                            # {"label": "Adj. Point Weighted Avg., 24 hrs.", "value": 'weighted_hr_24'},
+                                        ],
+                                        value='no_imputation',
+                                    ),
+                                    html.Br(),
+                                    html.A('    Select period for imputation (hours)'),
+                                    dcc.Slider(1,24,1,value=6,id='slider_imputation_biochemistry')
                                 ]
                             )
                         )
@@ -947,6 +967,96 @@ def determine_y_axis_string_value_biochemistry(datatable_traces_data):
 
 
 
+def impute_traces_biochemistry(traces,slider_imputation_biochemistry_value):
+    dataframe=pd.DataFrame(traces)
+    dataframe.rename(
+        {0:'time',1:'magnitude',2:'label'},
+        inplace=True,
+        axis='columns'
+    )
+    output_trace_dataframe_list=list()
+    for _,temp_dataframe in dataframe.groupby('label'):
+        temp_dataframe_copy=temp_dataframe.copy(deep=True)
+        temp_dataframe_copy.dropna(
+            axis='index',
+            how='all',
+            subset='magnitude',
+            inplace=True
+        )
+        if len(temp_dataframe_copy)<=1:
+            raise Exception('we are trying to impute, but there is only one valid value in the entire trace')
+        #determine start of range
+        for i in range(1,26):
+            if len(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)<=i*slider_imputation_biochemistry_value].index) > 0:
+                starting_index=i*slider_imputation_biochemistry_value
+                break
+            if i==25:
+                raise Exception(f'no valid timepoint foudn within first {i*slider_imputation_biochemistry_value} hours')
+        imputed_time_list=list(range(starting_index,math.ceil(temp_dataframe_copy['time'].astype(float).tolist()[-1]),slider_imputation_biochemistry_value))
+
+        print(imputed_time_list)
+
+        temp_label=temp_dataframe_copy['label'].unique().tolist()[0]
+        output_dataframe=pd.DataFrame.from_dict(
+            {
+                'time':imputed_time_list,
+                'magnitude':[-1 for i in imputed_time_list],
+                'label':[temp_label for i in imputed_time_list]
+            }
+        )
+
+        for index,series in output_dataframe.iterrows():
+            if temp_dataframe_copy['time'].isin([series['time']]).any():           
+                output_dataframe.at[index,'magnitude']=temp_dataframe_copy.loc[temp_dataframe_copy['time']==series['time']]['magnitude'].tolist()[0]
+                continue
+            else:
+                LHS_time=float(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)<float(series['time'])]['time'].tolist()[-1])
+                LHS_mag=float(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)<float(series['time'])]['magnitude'].tolist()[-1])
+                RHS_time=float(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)>float(series['time'])]['time'].tolist()[0])
+                RHS_mag=float(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)>float(series['time'])]['magnitude'].tolist()[0])
+
+
+
+
+                LHS_dist=abs(float(series['time'])-LHS_time)
+                RHS_dist=abs(float(series['time'])-RHS_time)
+
+                LHS_weighting=1-(LHS_dist/(LHS_dist+RHS_dist))
+                RHS_weighting=1-(RHS_dist/(LHS_dist+RHS_dist))
+                imputed_magnitude=(LHS_weighting*LHS_mag)+(RHS_weighting*RHS_mag)
+
+                # print('---')
+                # print(series['time'])
+                # print(LHS_time)
+                # print(LHS_mag)
+                # print(RHS_time)
+                # print(RHS_mag)
+                # print(LHS_dist)
+                # print(RHS_dist)
+                # print(LHS_weighting)
+                # print(RHS_weighting)
+                # print(imputed_magnitude)
+                # hold=input('hold')
+
+                
+                output_dataframe.at[index,'magnitude']=imputed_magnitude
+
+        output_trace_dataframe_list.append(output_dataframe)
+        # print(output_trace_dataframe_list)
+        # hold=input('hold')
+
+    output_dataframe_total=pd.concat(
+        output_trace_dataframe_list,
+        axis='index',
+        ignore_index=True
+    )
+
+    # print(traces)
+    # print(output_dataframe_total.values)
+    # hold=input('hold')
+
+    return output_dataframe_total.values
+
 
 @callback(
     [
@@ -959,17 +1069,22 @@ def determine_y_axis_string_value_biochemistry(datatable_traces_data):
     [
         State(component_id="datatable_traces_biochemistry", component_property="data"),
         State(component_id="radioitems_interpolation_biochemistry", component_property="value"),
-        State(component_id="radioitems_negatives_to_zero_biochemistry", component_property="value")
+        State(component_id="radioitems_negatives_to_zero_biochemistry", component_property="value"),
+        State(component_id="radioitems_imputation_biochemistry", component_property="value"),
+        State(component_id="slider_imputation_biochemistry", component_property="value"),
+        
     ],
     prevent_initial_call=True,
 )
-def add_traces_to_scatter(
+def add_traces_to_scatter_biochemistry(
     button_render_plot_n_clicks,
     button_clear_all_n_clicks,
 
     datatable_traces_data,
     radioitems_interpolation_value,
-    radioitems_negatives_to_zero_value
+    radioitems_negatives_to_zero_value,
+    radioitems_imputation_biochemistry_value,
+    slider_imputation_biochemistry_value
 ):
     if ctx.triggered_id=='button_clear_all_biochemistry':
         return [{}]
@@ -1025,7 +1140,11 @@ def add_traces_to_scatter(
     downsampling_mask=downsampling_mask.astype(bool)
     traces=traces[downsampling_mask]
 
-    pprint(traces)
+    # pprint(traces)
+    if radioitems_imputation_biochemistry_value!='no_imputation':
+        traces=impute_traces_biochemistry(traces,slider_imputation_biochemistry_value)
+
+    
 
     if radioitems_interpolation_value=='no_interpolation':
         temp_figure=px.scatter(
