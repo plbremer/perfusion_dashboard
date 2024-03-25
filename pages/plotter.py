@@ -950,8 +950,8 @@ def add_traces_to_datatable_biochemistry(
 
 def determine_y_axis_string_value_biochemistry(datatable_traces_data):
     global UNIT_DICT_BIOCHEMISTRY
-    pprint(UNIT_DICT_BIOCHEMISTRY)
-    print(datatable_traces_data)
+    # pprint(UNIT_DICT_BIOCHEMISTRY)
+    # print(datatable_traces_data)
     y_axis_terms=set()
     for temp_row in datatable_traces_data:
         try:
@@ -984,17 +984,21 @@ def impute_traces_biochemistry(traces,slider_imputation_biochemistry_value):
             inplace=True
         )
         if len(temp_dataframe_copy)<=1:
-            raise Exception('we are trying to impute, but there is only one valid value in the entire trace')
+            print('we are trying to impute, but there is only one valid value in the entire trace')
+            continue
+            # raise Exception('we are trying to impute, but there is only one valid value in the entire trace')
         #determine start of range
         for i in range(1,26):
             if len(temp_dataframe_copy.loc[temp_dataframe_copy['time'].astype(float)<=i*slider_imputation_biochemistry_value].index) > 0:
                 starting_index=i*slider_imputation_biochemistry_value
                 break
             if i==25:
-                raise Exception(f'no valid timepoint foudn within first {i*slider_imputation_biochemistry_value} hours')
+                print(f'no valid timepoint foudn within first {i*slider_imputation_biochemistry_value} hours')
+                continue
+                # raise Exception(f'no valid timepoint foudn within first {i*slider_imputation_biochemistry_value} hours')
         imputed_time_list=list(range(starting_index,math.ceil(temp_dataframe_copy['time'].astype(float).tolist()[-1]),slider_imputation_biochemistry_value))
 
-        print(imputed_time_list)
+        # print(imputed_time_list)
 
         temp_label=temp_dataframe_copy['label'].unique().tolist()[0]
         output_dataframe=pd.DataFrame.from_dict(
